@@ -1,0 +1,76 @@
+############################
+# .NET / ASP.NET Core
+############################
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build Results
+[Bb]in/
+[Oo]bj/
+**/Debug/
+**/Release/
+**/DebugPublic/
+**/publish/
+**/*.log
+
+## NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+
+## Azure
+PublishProfiles/
+*.pubxml
+*.azurePubxml
+appsettings.*.json
+
+############################
+# Clean Architecture Extras
+############################
+# Ignore EF Core Migrations if required (optional)
+# UserManagement.Infrastructure/Migrations/
+
+############################
+# Flutter / Dart
+############################
+# Flutter/Dart/Pub stuff
+**/user_management/.dart_tool/
+**/user_management/.packages
+**/user_management/.flutter-plugins
+**/user_management/.flutter-plugins-dependencies
+**/user_management/build/
+**/user_management/pubspec.lock
+**/user_management/ios/Pods/
+**/user_management/.metadata
+**/user_management/web/.dart_tool/
+
+# Coverage
+coverage/
+
+############################
+# OS Generated
+############################
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+############################
+# IDE Editors
+############################
+## JetBrains Rider / IntelliJ
+.idea/
+
+## VS Code
+.vscode/
+*.code-workspace
