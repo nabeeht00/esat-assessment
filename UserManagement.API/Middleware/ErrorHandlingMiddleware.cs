@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using UserManagement.Application.DTO;
+using UserManagement.Application.Exceptions;
 
 namespace UserManagement.API.Middleware
 {
@@ -21,17 +22,31 @@ namespace UserManagement.API.Middleware
             {
                 await _next(context);
             }
+            catch (NotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Not Found");
+                await WriteResponse(context, HttpStatusCode.NotFound, ex.Message);
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "Application Error");
+                await WriteResponse(context, HttpStatusCode.BadRequest, ex.Message);
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unhandled exception");
-
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                context.Response.ContentType = "application/json";
-
-                var response = ApiResponse<string>.Fail(ex.Message);
-
-                await context.Response.WriteAsJsonAsync(response);
+                await WriteResponse(context, HttpStatusCode.InternalServerError, "Something went wrong");
             }
+        }
+
+        private async Task WriteResponse(HttpContext context, HttpStatusCode status, string message)
+        {
+            context.Response.StatusCode = (int)status;
+            context.Response.ContentType = "application/json";
+
+            var response = ApiResponse<string>.Fail(message);
+
+            await context.Response.WriteAsJsonAsync(response);
         }
     }
 

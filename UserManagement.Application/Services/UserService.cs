@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UserManagement.Application.DTO;
+using UserManagement.Application.Exceptions;
 using UserManagement.Application.Interfaces.Repositories;
 using UserManagement.Application.Interfaces.Services;
 using UserManagement.Domain.Entities;
@@ -23,8 +24,15 @@ namespace UserManagement.Application.Services
 
         public async Task<ApiResponse<List<User>>> GetAllAsync(string? query)
         {
-            var users = await _repo.GetAllAsync(query);
-            return ApiResponse<List<User>>.Ok(users);
+            try
+            {
+                var users = await _repo.GetAllAsync(query);
+                return ApiResponse<List<User>>.Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<List<User>>.Fail(ex.Message);
+            }
         }
 
         public async Task<ApiResponse<User>> CreateAsync(UserRequest req)
@@ -35,42 +43,64 @@ namespace UserManagement.Application.Services
             if (string.IsNullOrWhiteSpace(req.Email))
                 return ApiResponse<User>.Fail("Email is required");
 
-            var user = new User
+            try
             {
-                Name = req.Name,
-                Email = req.Email,
-                Phone = req.Phone,
-                DateJoined = DateTime.UtcNow
-            };
+                var user = new User
+                {
+                    Name = req.Name,
+                    Email = req.Email,
+                    Phone = req.Phone
+                };
 
-            var created = await _repo.CreateAsync(user);
-            return ApiResponse<User>.Ok(created, "User created successfully");
+                var created = await _repo.CreateAsync(user);
+                return ApiResponse<User>.Ok(created, "User created successfully");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<User>.Fail(ex.Message);
+            }
         }
 
         public async Task<ApiResponse<User?>> UpdateAsync(int id, UserRequest req)
         {
-            var updatedUser = new User
+            try
             {
-                Id = id,
-                Name = req.Name,
-                Email = req.Email,
-                Phone = req.Phone
-            };
+                var updatedUser = new User
+                {
+                    Id = id,
+                    Name = req.Name,
+                    Email = req.Email,
+                    Phone = req.Phone
+                };
 
-            var result = await _repo.UpdateAsync(id, updatedUser);
-            if (result == null)
-                return ApiResponse<User?>.Fail("User not found");
-
-            return ApiResponse<User?>.Ok(result, "User updated successfully");
+                var result = await _repo.UpdateAsync(id, updatedUser);
+                return ApiResponse<User?>.Ok(result, "User updated successfully");
+            }
+            catch (NotFoundException ex)
+            {
+                return ApiResponse<User?>.Fail(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<User?>.Fail(ex.Message);
+            }
         }
 
         public async Task<ApiResponse<bool>> DeleteAsync(int id)
         {
-            var deleted = await _repo.DeleteAsync(id);
-            if (!deleted)
-                return ApiResponse<bool>.Fail("User not found");
-
-            return ApiResponse<bool>.Ok(true, "User deleted successfully");
+            try
+            {
+                var deleted = await _repo.DeleteAsync(id);
+                return ApiResponse<bool>.Ok(deleted, "User deleted successfully");
+            }
+            catch (NotFoundException ex)
+            {
+                return ApiResponse<bool>.Fail(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<bool>.Fail(ex.Message);
+            }
         }
     }
 
